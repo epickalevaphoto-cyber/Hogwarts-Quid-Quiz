@@ -5,46 +5,31 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const usernameEl = document.getElementById('username');
-    const passcodeEl = document.getElementById('passcode');
-
-    if (!usernameEl || !passcodeEl) {
-      alert('Ошибка структуры формы: не найдены поля ввода!');
-      return;
-    }
-
-    const username = usernameEl.value.trim();
-    const passcode = passcodeEl.value.trim();
-
-    if (!username || !passcode) {
-      alert('Заполните логин и пароль!');
-      return;
-    }
+    const username = document.getElementById('username').value.trim();
+    const passcode = document.getElementById('passcode').value.trim();
 
     try {
-      const { data, error } = await window.supabaseClient
-        .from('players')
-        .select('*')
-        .eq('username', username)
-        .eq('passcode', passcode)
-        .maybeSingle();
+      const { data, error } = await window.supabaseClient.rpc('login_user', {
+        p_username: username,
+        p_passcode: passcode
+      });
 
       if (error) {
-        alert('Ошибка базы данных: ' + error.message);
+        alert('Ошибка авторизации: ' + error.message);
         return;
       }
 
-      if (!data) {
+      if (!data || data.length === 0 || data[0].role !== 'player') {
         alert('Неверный логин или пароль игрока!');
         return;
       }
 
-      localStorage.setItem('quid_player', JSON.stringify(data));
+      localStorage.setItem('quid_user', JSON.stringify(data[0]));
       window.location.href = 'player.html';
 
     } catch (err) {
       console.error(err);
-      alert('Произошла непредвиденная ошибка при входе.');
+      alert('Ошибка при подключении к серверу.');
     }
   });
 });
