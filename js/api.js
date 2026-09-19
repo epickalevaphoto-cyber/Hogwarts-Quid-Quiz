@@ -1,18 +1,30 @@
 // js/api.js
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5UBDVt-uRDLVKzTA4lZhZSRwW0MjIgoJGQev1mCNIeuAvXaXhiPDR_7H0PnvxYsQ/exec';
+const API_URL = "https://script.google.com/macros/s/AKfycbxq6lOF_irGUvdNueov9VQocn5bxgULi-v7LCOUOlc78NwEjPHdBNaOlg4IkYzjPkg/exec";
 
-async function apiRequest(action, payload = {}) {
+/**
+ * Универсальная функция запросов к Google Apps Script
+ * Использует 'text/plain;charset=utf-8' для обхода ограничений CORS
+ */
+async function apiRequest(action, data = {}) {
   try {
-    const response = await fetch(GOOGLE_SCRIPT_URL, {
+    const payload = JSON.stringify({ action, ...data });
+    
+    const response = await fetch(API_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'text/plain;charset=utf-8' // Обязательно text/plain для обхода CORS
+      headers: { 
+        'Content-Type': 'text/plain;charset=utf-8' 
       },
-      body: JSON.stringify({ action, ...payload })
+      body: payload
     });
-    return await response.json();
-  } catch (err) {
-    console.error('Ошибка API:', err);
-    return { success: false, message: 'Ошибка связи с бэкендом Google Script' };
+
+    if (!response.ok) {
+      throw new Error(`Ошибка HTTP: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Ошибка при вызове API:", error);
+    return { success: false, error: error.message };
   }
 }
