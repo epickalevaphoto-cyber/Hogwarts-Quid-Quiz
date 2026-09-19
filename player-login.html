@@ -1,26 +1,33 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Вход игрока — Hogwarts Quidditch</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Вход для Игроков — Hogwarts Quid Quiz</title>
   <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <main class="auth-page">
-    <section class="auth-card">
-      <a class="back" href="index.html">← На главную</a>
-      <p class="eyebrow">PLAYER ACCESS</p>
-      <h1>Вход игрока</h1>
-      <p class="muted">Введите выданные судьёй логин и пароль.</p>
+  <div class="container" style="max-width: 400px; margin-top: 50px;">
+    <div class="card">
+      <h2>Вход для Игрока</h2>
       <form id="player-login-form">
-        <label>Логин<input id="username" required autocomplete="username"></label>
-        <label>Пароль<input id="password" type="password" required autocomplete="current-password"></label>
-        <button class="button" type="submit">Войти в игру</button>
-        <div id="login-error" class="error"></div>
+        <div style="margin-bottom: 15px;">
+          <label for="username">Логин игрока:</label>
+          <input type="text" id="username" required autocomplete="username" style="width: 100%; padding: 8px; margin-top: 5px;">
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <label for="passcode">Пароль:</label>
+          <input type="password" id="passcode" required autocomplete="current-password" style="width: 100%; padding: 8px; margin-top: 5px;">
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Войти в игру</button>
       </form>
-    </section>
-  </main>
-  <script type="module" src="js/player-login.js"></script>
+    </div>
+  </div>
+
+  <script src="js/supabase.js"></script>
+  <script src="js/player-login.js"></script>
 </body>
 </html>
