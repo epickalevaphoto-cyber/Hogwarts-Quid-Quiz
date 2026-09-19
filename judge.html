@@ -2,80 +2,71 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Панель Судьи — Hogwarts Quidditch</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <header class="navbar">
-    <div class="logo">✦ Hogwarts Quidditch</div>
+    <div class="logo">✦ Панель Судьи</div>
     <button class="btn btn-secondary" onclick="logout()">Выйти</button>
   </header>
 
-  <main class="container">
-    <div class="header-title">
-      <span class="subtitle">REFEREE CONSOLE</span>
-      <h1>Панель судьи</h1>
-    </div>
-
-    <!-- Управление матчем -->
+  <main class="container" style="max-width: 900px; margin: 20px auto;">
+    
+    <!-- Счет и ход -->
     <div class="card">
-      <h3>Управление матчем</h3>
-      <div class="score-board" style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
-        <div class="team-score">
+      <h3>Управление Матчем</h3>
+      <div style="display: flex; justify-content: space-around; align-items: center; margin: 20px 0;">
+        <div style="text-align: center;">
           <h4>Команда А</h4>
-          <span id="score-a" class="score-display">0</span>
-          <div style="margin-top: 10px;">
-            <button class="btn btn-small" onclick="changeScore('a', 10)">+10</button>
-            <button class="btn btn-small" onclick="changeScore('a', -10)">-10</button>
+          <span id="score-a" style="font-size: 3em; font-weight: bold;">0</span>
+          <div>
+            <button onclick="addScore('a', 10)">+10</button>
+            <button onclick="addScore('a', -10)">-10</button>
           </div>
         </div>
 
-        <div class="match-info" style="text-align: center;">
-          <div>Шаг: <strong id="current-step">1</strong></div>
-          <div style="margin-top: 5px;">Статус: <span id="match-status">Ожидание</span></div>
-          <div style="margin-top: 15px;">
-            <button class="btn btn-primary" id="btn-next-step" onclick="nextStep()">Следующий шаг</button>
-          </div>
+        <div style="text-align: center;">
+          <div>Очередь: <strong id="current-turn-display">Команда 1</strong></div>
+          <button onclick="switchTurn()" style="margin-top: 5px;">Передать ход</button>
+          <div style="margin-top: 15px;">Таймер: <strong id="timer-display">0</strong> сек.</div>
+          <button onclick="startTimer(30)">Запустить 30 сек</button>
         </div>
 
-        <div class="team-score">
+        <div style="text-align: center;">
           <h4>Команда Б</h4>
-          <span id="score-b" class="score-display">0</span>
-          <div style="margin-top: 10px;">
-            <button class="btn btn-small" onclick="changeScore('b', 10)">+10</button>
-            <button class="btn btn-small" onclick="changeScore('b', -10)">-10</button>
+          <span id="score-b" style="font-size: 3em; font-weight: bold;">0</span>
+          <div>
+            <button onclick="addScore('b', 10)">+10</button>
+            <button onclick="addScore('b', -10)">-10</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Снитч -->
+    <!-- Поле задавания вопросов -->
     <div class="card" style="margin-top: 20px;">
-      <h3>Управление Снитчем</h3>
-      <div style="display: flex; gap: 10px; margin-top: 10px;">
-        <button class="btn btn-warning" onclick="toggleSnitch('appeared')">Запустить Снитч</button>
-        <button class="btn btn-secondary" onclick="toggleSnitch('hidden')">Скрыть Снитч</button>
+      <h3>Задать вопрос игрокам</h3>
+      <div style="display: flex; gap: 10px;">
+        <input type="text" id="question-input" placeholder="Введите вопрос для раунда..." style="flex: 1; padding: 10px;">
+        <button class="btn btn-primary" onclick="sendQuestion()">Задать вопрос</button>
       </div>
+      <p style="margin-top: 10px; color: #aaa;">Текущий вопрос: <strong id="active-question">—</strong></p>
     </div>
 
-    <!-- Чат -->
+    <!-- Общий чат для контроля всех ответов -->
     <div class="card" style="margin-top: 20px;">
-      <h3>Чат матча</h3>
-      <div id="chat-messages" class="chat-box" style="height: 200px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); padding: 10px; margin-bottom: 10px; border-radius: 6px;">
-        <!-- Сообщения чата загружаются здесь -->
-      </div>
+      <h3>Все ответы и Чат</h3>
+      <div id="chat-messages" style="height: 200px; overflow-y: auto; background: #111; padding: 10px; margin-bottom: 10px;"></div>
       <form id="chat-form" style="display: flex; gap: 10px;">
-        <input type="text" id="chat-input" placeholder="Введите сообщение..." style="flex: 1; padding: 8px;">
+        <input type="text" id="chat-input" placeholder="Сообщение судьи..." style="flex: 1; padding: 8px;">
         <button type="submit" class="btn btn-primary">Отправить</button>
       </form>
     </div>
   </main>
 
-  <!-- ПРАВИЛЬНЫЙ ПОРЯДОК ПОДКЛЮЧЕНИЯ СКРИПТОВ (без type="module") -->
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
-  <script src="js/chat.js"></script>
   <script src="js/judge.js"></script>
 </body>
 </html>
