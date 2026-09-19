@@ -1,23 +1,42 @@
-import { login } from "./auth.js";
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('player-login-form');
+  if (!form) return;
 
-const form = document.querySelector("#player-login-form");
-const error = document.querySelector("#login-error");
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-form?.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  error.textContent = "";
-  const button = form.querySelector("button");
-  button.disabled = true;
-  try {
-    await login(
-      document.querySelector("#username").value,
-      document.querySelector("#password").value,
-      "player"
-    );
-    location.href = "player.html";
-  } catch (e) {
-    error.textContent = e.message;
-  } finally {
-    button.disabled = false;
-  }
+    const username = document.getElementById('username').value.trim();
+    const passcode = document.getElementById('passcode').value.trim();
+
+    if (!username || !passcode) {
+      alert('Заполните логин и пароль!');
+      return;
+    }
+
+    try {
+      const { data, error } = await window.supabaseClient
+        .from('players')
+        .select('*')
+        .eq('username', username)
+        .eq('passcode', passcode)
+        .maybeSingle();
+
+      if (error) {
+        alert('Ошибка базы данных: ' + error.message);
+        return;
+      }
+
+      if (!data) {
+        alert('Неверный логин или пароль игрока!');
+        return;
+      }
+
+      localStorage.setItem('quid_player', JSON.stringify(data));
+      window.location.href = 'player.html';
+
+    } catch (err) {
+      console.error(err);
+      alert('Произошла непредвиденная ошибка.');
+    }
+  });
 });
