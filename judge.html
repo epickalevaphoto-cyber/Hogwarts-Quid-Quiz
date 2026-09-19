@@ -1,104 +1,81 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Панель судьи — Hogwarts Quidditch</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Панель Судьи — Hogwarts Quidditch</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<header class="topbar">
-  <a class="brand" href="index.html">✦ Hogwarts Quidditch</a>
-  <div class="topbar-right"><span id="judge-name"></span><button id="logout" class="small-btn ghost">Выйти</button></div>
-</header>
+  <header class="navbar">
+    <div class="logo">✦ Hogwarts Quidditch</div>
+    <button class="btn btn-secondary" onclick="logout()">Выйти</button>
+  </header>
 
-<main class="container">
-  <div id="error" class="error"></div>
-  <section class="page-heading"><p class="eyebrow">REFEREE CONSOLE</p><h1>Панель судьи</h1></section>
-
-  <section class="card">
-    <div class="section-title"><h2>Создать матч</h2></div>
-    <form id="create-form" class="form-grid">
-      <label>Название матча<input id="new-title" required placeholder="Гриффиндор vs Слизерин"></label>
-      <label>Команда 1<input id="new-team1" required></label>
-      <label>Команда 2<input id="new-team2" required></label>
-      <button class="button" type="submit">Создать матч</button>
-    </form>
-  </section>
-
-  <section class="card">
-    <label>Текущий матч
-      <select id="match-select"></select>
-    </label>
-  </section>
-
-  <section id="match-panel" hidden>
-    <section class="score-grid">
-      <article class="card stat"><small>Матч</small><strong id="match-title">—</strong></article>
-      <article class="card stat"><small>Статус</small><strong id="status">—</strong></article>
-      <article class="card stat"><small>Этап</small><strong id="stage">—</strong></article>
-      <article class="card stat"><small>Обновление</small><strong>LIVE</strong></article>
-    </section>
-
-    <section class="scoreboard">
-      <article><span id="team-a-name">Команда 1</span><strong id="team-a-score">0</strong></article>
-      <article><span id="team-b-name">Команда 2</span><strong id="team-b-score">0</strong></article>
-    </section>
-
-    <section class="card">
-      <h2>Управление матчем</h2>
-      <div class="toolbar">
-        <button class="button" data-status-action="start_match">Запустить матч</button>
-        <button class="button secondary" data-status-action="pause_match">Пауза</button>
-        <button class="button secondary" data-status-action="resume_match">Продолжить</button>
-        <button class="button danger" data-status-action="finish_match">Завершить матч</button>
-      </div>
-      <div class="toolbar stage-buttons">
-        <button class="small-btn" data-stage="1">Этап 1</button>
-        <button class="small-btn" data-stage="2">Этап 2</button>
-        <button class="small-btn" data-stage="3">Этап 3</button>
-      </div>
-    </section>
-
-    <div class="two-col">
-      <section class="card">
-        <h2>Игроки</h2>
-        <form id="add-player-form" class="stack compact">
-          <select id="player-user" required></select>
-          <select id="player-team" required></select>
-          <select id="player-position" required>
-            <option value="keeper">Вратарь</option>
-            <option value="seeker">Ловец</option>
-            <option value="beater">Загонщик</option>
-            <option value="chaser">Охотник</option>
-          </select>
-          <button class="button" type="submit">Добавить игрока</button>
-        </form>
-        <div id="players" class="list"></div>
-      </section>
-
-      <section class="card">
-        <h2>Вопросы и ответы</h2>
-        <div id="questions" class="list"></div>
-      </section>
+  <main class="container">
+    <div class="header-title">
+      <span class="subtitle">REFEREE CONSOLE</span>
+      <h1>Панель судьи</h1>
     </div>
 
-    <section class="card">
-      <div class="section-title"><h2>Поимки снитча</h2><span class="badge gold-badge">150 ОЧКОВ</span></div>
-      <div id="catches" class="list"></div>
-    </section>
+    <!-- Управление матчем -->
+    <div class="card">
+      <h3>Управление матчем</h3>
+      <div class="score-board" style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
+        <div class="team-score">
+          <h4>Команда А</h4>
+          <span id="score-a" class="score-display">0</span>
+          <div style="margin-top: 10px;">
+            <button class="btn btn-small" onclick="changeScore('a', 10)">+10</button>
+            <button class="btn btn-small" onclick="changeScore('a', -10)">-10</button>
+          </div>
+        </div>
 
-    <section class="card">
-      <div class="section-title"><h2>Чат</h2><span class="badge">REALTIME</span></div>
-      <div id="chat" class="chat"></div>
-      <form id="chat-form" class="chat-form">
-        <input id="chat-input" maxlength="2000" placeholder="Сообщение..." required>
-        <button class="button" type="submit">Отправить</button>
+        <div class="match-info" style="text-align: center;">
+          <div>Шаг: <strong id="current-step">1</strong></div>
+          <div style="margin-top: 5px;">Статус: <span id="match-status">Ожидание</span></div>
+          <div style="margin-top: 15px;">
+            <button class="btn btn-primary" id="btn-next-step" onclick="nextStep()">Следующий шаг</button>
+          </div>
+        </div>
+
+        <div class="team-score">
+          <h4>Команда Б</h4>
+          <span id="score-b" class="score-display">0</span>
+          <div style="margin-top: 10px;">
+            <button class="btn btn-small" onclick="changeScore('b', 10)">+10</button>
+            <button class="btn btn-small" onclick="changeScore('b', -10)">-10</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Снитч -->
+    <div class="card" style="margin-top: 20px;">
+      <h3>Управление Снитчем</h3>
+      <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button class="btn btn-warning" onclick="toggleSnitch('appeared')">Запустить Снитч</button>
+        <button class="btn btn-secondary" onclick="toggleSnitch('hidden')">Скрыть Снитч</button>
+      </div>
+    </div>
+
+    <!-- Чат -->
+    <div class="card" style="margin-top: 20px;">
+      <h3>Чат матча</h3>
+      <div id="chat-messages" class="chat-box" style="height: 200px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); padding: 10px; margin-bottom: 10px; border-radius: 6px;">
+        <!-- Сообщения чата загружаются здесь -->
+      </div>
+      <form id="chat-form" style="display: flex; gap: 10px;">
+        <input type="text" id="chat-input" placeholder="Введите сообщение..." style="flex: 1; padding: 8px;">
+        <button type="submit" class="btn btn-primary">Отправить</button>
       </form>
-    </section>
-  </section>
-</main>
+    </div>
+  </main>
 
-<script type="module" src="js/judge.js"></script>
+  <!-- ПРАВИЛЬНЫЙ ПОРЯДОК ПОДКЛЮЧЕНИЯ СКРИПТОВ (без type="module") -->
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/chat.js"></script>
+  <script src="js/judge.js"></script>
 </body>
 </html>
