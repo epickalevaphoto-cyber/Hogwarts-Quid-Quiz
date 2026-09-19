@@ -2,7 +2,6 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Игрок — Hogwarts Quidditch</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -16,26 +15,34 @@
   </header>
 
   <main class="container" style="max-width: 800px; margin: 20px auto;">
-    <!-- Статус раунда -->
-    <div class="card" style="text-align: center; padding: 20px;">
-      <div style="font-size: 1.1em; color: #888;">Текущий ход:</div>
-      <h2 id="turn-box" style="margin: 10px 0; font-size: 1.8em;">Загрузка...</h2>
-      
-      <div style="margin-top: 15px;">Осталось времени на ход:</div>
-      <div id="timer-box" style="font-size: 3em; font-weight: bold; color: #e74c3c; margin-top: 5px;">00:00</div>
+    <!-- Информационное Табло -->
+    <div class="card" style="text-align: center; padding: 15px;">
+      <h3 style="color: #f1c40f; margin-bottom: 5px;" id="current-stage">Этап: Загрузка...</h3>
+      <div id="turn-box" style="font-size: 1.4em; font-weight: bold; margin: 10px 0;">Ожидание...</div>
+      <div>Осталось времени на ход:</div>
+      <div id="timer-box" style="font-size: 2.8em; font-weight: bold; color: #e74c3c;">00:00</div>
     </div>
 
-    <!-- Раздельные Чаты -->
-    <div class="card" style="margin-top: 20px;">
-      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+    <!-- Загрузка Картинки с устройства -->
+    <div class="card" style="margin-top: 15px; padding: 12px; border: 1px solid #f1c40f;">
+      <small style="color: #f1c40f; font-weight: bold;">📷 ОТПРАВИТЬ ИЗОБРАЖЕНИЕ В ОБЩИЙ ЧАТ:</small>
+      <div style="display: flex; gap: 10px; margin-top: 8px; align-items: center;">
+        <input type="file" id="image-file-input" accept="image/*" style="flex: 1; color: #fff;">
+        <button class="btn btn-primary" onclick="uploadImage()" style="padding: 6px 12px;">Отправить фото</button>
+      </div>
+    </div>
+
+    <!-- Вкладки Чата -->
+    <div class="card" style="margin-top: 15px;">
+      <div style="display: flex; gap: 10px; margin-bottom: 10px;">
         <button id="tab-team" class="btn btn-primary" onclick="switchTab('team')" style="flex: 1;">🔒 Командный чат</button>
         <button id="tab-global" class="btn btn-secondary" onclick="switchTab('global')" style="flex: 1; opacity: 0.6;">🌐 Общий чат (Поле)</button>
       </div>
 
-      <div id="chat-messages" style="height: 280px; overflow-y: auto; background: #0f111a; padding: 12px; border-radius: 6px; margin-bottom: 10px;"></div>
+      <div id="chat-messages" style="height: 250px; overflow-y: auto; background: #0f111a; padding: 10px; border-radius: 6px; margin-bottom: 10px;"></div>
 
       <form id="chat-form" style="display: flex; gap: 10px;">
-        <input type="text" id="chat-input" placeholder="Введите сообщение..." style="flex: 1; padding: 10px;">
+        <input type="text" id="chat-input" placeholder="Введите текст сообщения..." style="flex: 1; padding: 10px;">
         <button type="submit" class="btn btn-primary">Отправить</button>
       </form>
     </div>
