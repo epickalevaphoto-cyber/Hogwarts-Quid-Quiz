@@ -1,39 +1,52 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Hogwarts Quidditch — экран матча</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Главное Табло — Hogwarts Quidditch</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="screen-page">
-  <main class="screen-shell">
-    <section id="waiting" class="screen-waiting">Ожидание матча…</section>
-    <div id="content" hidden>
-      <header class="screen-header">
-        <p>HOGWARTS QUIDDITCH</p>
-        <h1 id="title">Матч</h1>
-        <div><span id="status">—</span> · <span id="stage">—</span></div>
-      </header>
-      <section id="scores" class="screen-scores"></section>
-      <section class="screen-panel">
-        <span>ТЕКУЩИЙ ВОПРОС</span>
-        <h2 id="question">Вопрос появится здесь.</h2>
-      </section>
-      <section class="screen-panel">
-        <span>ТЕКУЩИЙ ОТВЕТ</span>
-        <h2 id="answer">Ответ появится после отправки.</h2>
-      </section>
-      <section id="snitch-banner" class="snitch-banner" hidden>
-        <strong>СНИТЧ ПОЙМАН!</strong>
-        <span id="winner">Победитель: —</span>
-      </section>
-      <section class="screen-events">
-        <span>ПОСЛЕДНИЕ СОБЫТИЯ</span>
-        <div id="events"></div>
-      </section>
+<body style="background: #0f111a; color: #fff; font-family: sans-serif;">
+  <div class="container" style="max-width: 900px; margin: 40px auto; text-align: center;">
+    <h1 style="font-size: 2.5em; color: #f1c40f; letter-spacing: 2px;">✦ HOGWARTS QUIDDITCH MATCH ✦</h1>
+    <div style="margin-top: 10px; font-size: 1.2em; color: #888;">
+      Статус матча: <span id="match-status" style="color: #4cd137; font-weight: bold;">Загрузка...</span>
     </div>
-  </main>
-<script type="module" src="js/screen.js"></script>
+
+    <!-- Главное табло счёта -->
+    <div class="card" style="margin-top: 30px; padding: 40px; background: #1a1d2e; border-radius: 12px; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+      <div>
+        <h2 style="font-size: 2em; margin-bottom: 10px; color: #e74c3c;">Команда А</h2>
+        <span id="score-a" style="font-size: 5em; font-weight: bold; color: #ffffff;">0</span>
+      </div>
+
+      <div style="font-size: 1.5em; border-left: 2px solid #333; border-right: 2px solid #333; padding: 0 30px;">
+        <div style="font-size: 0.8em; color: #aaa;">ШАГ</div>
+        <div id="current-step" style="font-size: 3em; font-weight: bold; color: #f1c40f;">1</div>
+      </div>
+
+      <div>
+        <h2 style="font-size: 2em; margin-bottom: 10px; color: #3498db;">Команда Б</h2>
+        <span id="score-b" style="font-size: 5em; font-weight: bold; color: #ffffff;">0</span>
+      </div>
+    </div>
+
+    <!-- Индикатор Снитча -->
+    <div id="snitch-banner" style="margin-top: 25px; padding: 15px; border-radius: 8px; font-size: 1.4em; font-weight: bold; background: #252836; display: none;">
+      ⚡ ПОЙМАН СНИТЧ!
+    </div>
+
+    <!-- Трансляция чата -->
+    <div class="card" style="margin-top: 30px; text-align: left; background: #1a1d2e; padding: 20px; border-radius: 12px;">
+      <h3 style="margin-top: 0; color: #aaa;">Прямой эфир / Чат</h3>
+      <div id="chat-messages" style="height: 250px; overflow-y: auto; background: #0f111a; padding: 15px; border-radius: 6px; font-size: 1.1em; line-height: 1.6;">
+        <!-- Сообщения будут появляться здесь -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Подключение скриптов -->
+  <script src="js/api.js"></script>
+  <script src="js/screen.js"></script>
 </body>
 </html>
