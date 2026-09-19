@@ -5,36 +5,31 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const usernameInput = document.getElementById('judge-username');
-    const passcodeInput = document.getElementById('judge-passcode');
-
-    const username = usernameInput ? usernameInput.value.trim() : 'судья';
-    const passcode = passcodeInput ? passcodeInput.value.trim() : '';
+    const username = document.getElementById('username').value.trim();
+    const passcode = document.getElementById('passcode').value.trim();
 
     try {
-      const { data, error } = await window.supabaseClient
-        .from('judges')
-        .select('*')
-        .eq('username', username)
-        .eq('passcode', passcode)
-        .maybeSingle();
+      const { data, error } = await window.supabaseClient.rpc('login_user', {
+        p_username: username,
+        p_passcode: passcode
+      });
 
       if (error) {
-        alert('Ошибка связи с базой: ' + error.message);
+        alert('Ошибка авторизации: ' + error.message);
         return;
       }
 
-      if (!data) {
-        alert('Неверный логин или пароль судьи!');
+      if (!data || data.length === 0 || data[0].role !== 'judge') {
+        alert('Неверный логин/пароль судьи!');
         return;
       }
 
-      localStorage.setItem('quid_judge', JSON.stringify(data));
+      localStorage.setItem('quid_user', JSON.stringify(data[0]));
       window.location.href = 'judge.html';
 
     } catch (err) {
       console.error(err);
-      alert('Ошибка при авторизации.');
+      alert('Ошибка при подключении к серверу.');
     }
   });
 });
