@@ -1,69 +1,82 @@
-// js/judge.js
+let localState = {};
 
-let currentGameState = {
-  team_a_score: 0,
-  team_b_score: 0,
-  current_step: 1,
-  status: 'waiting',
-  snitch_status: 'hidden',
-  snitch_winner: ''
-};
-
-// Проверяем права судьи
 document.addEventListener('DOMContentLoaded', () => {
   requireAuth('judge');
-  syncGameState();
-  setInterval(syncGameState, 2000); // Синхронизация каждые 2 секунды
+  syncJudge();
+  setInterval(syncJudge, 2000);
+
+  const chatForm = document.getElementById('chat-form');
+  if (chatForm) {
+    chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const input = document.getElementById('chat-input');
+      if (input.value.trim()) {
+        await apiRequest('send_chat', {
+          sender_name: 'СУДЬЯ',
+          message: input.value.trim(),
+          team_code: 'global'
+        });
+        input.value = '';
+        syncJudge();
+      }
+    });
+  }
 });
 
-async function syncGameState() {
+async function syncJudge() {
   const res = await apiRequest('get_state');
-  if (res.success && res.state) {
-    currentGameState = res.state;
-    updateUI();
+  if (!res.success) return;
+
+  localState = res.state;
+
+  document.getElementById('score-a').textContent = localState.team_a_score;
+  document.getElementById('score-b').textContent = localState.team_b_score;
+  document.getElementById('current-turn-display').textContent = localState.current_turn === 'team_1' ? 'Команда 1 (А)' : 'Команда 2 (Б)';
+  document.getElementById('timer-display').textContent = localState.timer_seconds;
+  document.getElementById('active-question').textContent = localState.current_question || '—';
+
+  // Отрисовка сообщений
+  const chatBox = document.getElementById('chat-messages');
+  if (chatBox && res.chat) {
+    chatBox.innerHTML = '';
+    res.chat.forEach(msg => {
+      const div = document.createElement('div');
+      div.style.marginBottom = '5px';
+      div.innerHTML = `<small>[${msg.team_code}]</small> <strong>${msg.sender_name}:</strong> ${msg.message}`;
+      chatBox.appendChild(div);
+    });
+    chatBox.scrollTop = chatBox.scrollHeight;
   }
 }
 
-function updateUI() {
-  document.getElementById('score-a').textContent = currentGameState.team_a_score;
-  document.getElementById('score-b').textContent = currentGameState.team_b_score;
-  document.getElementById('current-step').textContent = currentGameState.current_step;
-  
-  const statusEl = document.getElementById('match-status');
-  if (statusEl) {
-    statusEl.textContent = currentGameState.status === 'in_progress' ? 'Идет матч' : 'Ожидание';
+// Строгое математическое сложение чисел для исправления ошибок со счетом
+async function addScore(team, delta) {
+  let scoreA = Number(localState.team_a_score) || 0;
+  let scoreB = Number(localState.team_b_score) || 0;
+
+  if (team === 'a') scoreA = Math.max(0, scoreA + delta);
+  if (team === 'b') scoreB = Math.max(0, scoreB + delta);
+
+  await apiRequest('update_score', { team_a_score: scoreA, team_b_score: scoreB });
+  syncJudge();
+}
+
+async function switchTurn() {
+  const nextTurn = localState.current_turn === 'team_1' ? 'team_2' : 'team_1';
+  await apiRequest('update_score', { current_turn: nextTurn });
+  syncJudge();
+}
+
+async function startTimer(seconds) {
+  await apiRequest('update_score', { timer_seconds: seconds });
+  syncJudge();
+}
+
+async function sendQuestion() {
+  const q = document.getElementById('question-input').value.trim();
+  if (q) {
+    await apiRequest('update_score', { current_question: q, timer_seconds: 30 });
+    document.getElementById('question-input').value = '';
+    syncJudge();
   }
-}
-
-async function changeScore(team, delta) {
-  if (team === 'a') {
-    currentGameState.team_a_score = Math.max(0, Number(currentGameState.team_a_score) + delta);
-  } else {
-    currentGameState.team_b_score = Math.max(0, Number(currentGameState.team_b_score) + delta);
-  }
-  
-  updateUI();
-  await apiRequest('update_score', {
-    team_a_score: currentGameState.team_a_score,
-    team_b_score: currentGameState.team_b_score
-  });
-}
-
-async function nextStep() {
-  currentGameState.current_step = Number(currentGameState.current_step) + 1;
-  currentGameState.status = 'in_progress';
-  
-  updateUI();
-  await apiRequest('update_score', {
-    current_step: currentGameState.current_step,
-    status: currentGameState.status
-  });
-}
-
-async function toggleSnitch(snitchStatus) {
-  currentGameState.snitch_status = snitchStatus;
-  await apiRequest('update_score', {
-    snitch_status: snitchStatus
-  });
-  alert(snitchStatus === 'appeared' ? 'Снитч запущен!' : 'Снитч скрыт.');
 }
