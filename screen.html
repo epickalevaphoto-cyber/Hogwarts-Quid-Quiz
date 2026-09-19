@@ -1,52 +1,81 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Главное Табло — Hogwarts Quidditch</title>
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body style="background: #0f111a; color: #fff; font-family: sans-serif;">
-  <div class="container" style="max-width: 900px; margin: 40px auto; text-align: center;">
-    <h1 style="font-size: 2.5em; color: #f1c40f; letter-spacing: 2px;">✦ HOGWARTS QUIDDITCH MATCH ✦</h1>
-    <div style="margin-top: 10px; font-size: 1.2em; color: #888;">
-      Статус матча: <span id="match-status" style="color: #4cd137; font-weight: bold;">Загрузка...</span>
-    </div>
+// js/screen.js
+let isScreenRequesting = false;
 
-    <!-- Главное табло счёта -->
-    <div class="card" style="margin-top: 30px; padding: 40px; background: #1a1d2e; border-radius: 12px; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
-      <div>
-        <h2 style="font-size: 2em; margin-bottom: 10px; color: #e74c3c;">Команда А</h2>
-        <span id="score-a" style="font-size: 5em; font-weight: bold; color: #ffffff;">0</span>
-      </div>
+const STAGES = [
+  "1. Первые Охотники (Охотники 1)",
+  "2. Вторые Охотники (Охотники 2)",
+  "3. Третьи Охотники (Охотники 3)",
+  "4. Первые Загонщики (Загонщики 1)",
+  "5. Вторые Загонщики (Загонщики 2)",
+  "6. Третьи Загонщики (Загонщики 3)",
+  "7. Первые Ловцы (Ловцы 1)",
+  "8. Вторые Ловцы (Ловцы 2)",
+  "9. Вратари"
+];
 
-      <div style="font-size: 1.5em; border-left: 2px solid #333; border-right: 2px solid #333; padding: 0 30px;">
-        <div style="font-size: 0.8em; color: #aaa;">ШАГ</div>
-        <div id="current-step" style="font-size: 3em; font-weight: bold; color: #f1c40f;">1</div>
-      </div>
+document.addEventListener('DOMContentLoaded', () => {
+  syncScreen();
+  setInterval(syncScreen, 1500);
+});
 
-      <div>
-        <h2 style="font-size: 2em; margin-bottom: 10px; color: #3498db;">Команда Б</h2>
-        <span id="score-b" style="font-size: 5em; font-weight: bold; color: #ffffff;">0</span>
-      </div>
-    </div>
+async function syncScreen() {
+  if (isScreenRequesting) return;
+  isScreenRequesting = true;
 
-    <!-- Индикатор Снитча -->
-    <div id="snitch-banner" style="margin-top: 25px; padding: 15px; border-radius: 8px; font-size: 1.4em; font-weight: bold; background: #252836; display: none;">
-      ⚡ ПОЙМАН СНИТЧ!
-    </div>
+  const res = await apiRequest('get_state');
+  isScreenRequesting = false;
+  if (!res || !res.success) return;
 
-    <!-- Трансляция чата -->
-    <div class="card" style="margin-top: 30px; text-align: left; background: #1a1d2e; padding: 20px; border-radius: 12px;">
-      <h3 style="margin-top: 0; color: #aaa;">Прямой эфир / Чат</h3>
-      <div id="chat-messages" style="height: 250px; overflow-y: auto; background: #0f111a; padding: 15px; border-radius: 6px; font-size: 1.1em; line-height: 1.6;">
-        <!-- Сообщения будут появляться здесь -->
-      </div>
-    </div>
-  </div>
+  const state = res.state;
 
-  <!-- Подключение скриптов -->
-  <script src="js/api.js"></script>
-  <script src="js/screen.js"></script>
-</body>
-</html>
+  // 1. Обновляем счет и этапы
+  const elScoreA = document.getElementById('score-a');
+  if (elScoreA) elScoreA.textContent = state.team_a_score;
+
+  const elScoreB = document.getElementById('score-b');
+  if (elScoreB) elScoreB.textContent = state.team_b_score;
+
+  const stepIdx = state.current_step || 0;
+  const elStage = document.getElementById('stage-display');
+  if (elStage) elStage.textContent = STAGES[stepIdx] || "Финал";
+
+  const elTurn = document.getElementById('turn-display');
+  if (elTurn) elTurn.textContent = state.current_turn === 'team_1' ? 'Команда А' : 'Команда Б';
+
+  // 2. Таймер ММ:СС
+  const now = Date.now();
+  const timerEnd = Number(state.timer_end) || 0;
+  const secondsLeft = Math.max(0, Math.ceil((timerEnd - now) / 1000));
+
+  const mins = String(Math.floor(secondsLeft / 60)).padStart(2, '0');
+  const secs = String(secondsLeft % 60).padStart(2, '0');
+  
+  const elTimer = document.getElementById('timer-display');
+  if (elTimer) elTimer.textContent = `${mins}:${secs}`;
+
+  // 3. ЧАТ ГОСТЕЙ: Фильтрация STRICT ONLY 'global'
+  const chatBox = document.getElementById('chat-messages');
+  if (chatBox && res.chat) {
+    chatBox.innerHTML = '';
+    
+    res.chat.forEach(msg => {
+      // Строго проверяем, что сообщение из ОБЩЕГО чата
+      if (msg.team_code === 'global') {
+        let text = msg.message;
+
+        // Если это фото — рендерим картинку
+        if (text.startsWith('[IMAGE]')) {
+          const imgData = text.replace('[IMAGE]', '');
+          text = `<br><img src="${imgData}" style="max-width: 100%; max-height: 250px; border-radius: 8px; border: 2px solid #f1c40f; margin-top: 6px;">`;
+        }
+
+        const div = document.createElement('div');
+        div.style.marginBottom = '8px';
+        div.innerHTML = `<strong style="color: #f1c40f;">${msg.sender_name}:</strong> ${text}`;
+        chatBox.appendChild(div);
+      }
+    });
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+}
