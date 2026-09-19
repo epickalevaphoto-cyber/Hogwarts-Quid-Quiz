@@ -1,51 +1,59 @@
-import { select, realtime } from "./supabase.js";
+// js/screen.js
 
-const $ = id => document.getElementById(id);
-const matchId = new URLSearchParams(location.search).get("match");
+document.addEventListener('DOMContentLoaded', () => {
+  updateScreen();
+  // Опрос Google Таблицы каждые 2 секунды для мгновенного обновления табло зрителей
+  setInterval(updateScreen, 2000);
+});
 
-async function refresh() {
-  try {
-    const matches = matchId
-      ? await select("matches", { filters: { id: matchId }, limit: 1 })
-      : await select("matches", { order: "created_at.desc", limit: 1 });
-    const match = matches[0];
-    if (!match) {
-      $("waiting").hidden = false;
-      $("content").hidden = true;
-      return;
-    }
-    $("waiting").hidden = true;
-    $("content").hidden = false;
-    $("title").textContent = match.title;
-    $("status").textContent = statusLabel(match.status);
-    $("stage").textContent = `Этап ${match.stage}`;
-    const teams = await select("teams", { filters: { match_id: match.id }, order: "slot.asc" });
-    $("scores").innerHTML = teams.map(t => `<article><span>${escapeHtml(t.name)}</span><strong>${t.score}</strong></article>`).join("");
-    const questions = await select("questions", { filters: { match_id: match.id }, order: "created_at.desc", limit: 1 });
-    const question = questions[0];
-    $("question").textContent = question?.text || "Вопрос появится здесь.";
-    const answers = question ? await select("answers", { filters: { question_id: question.id }, order: "created_at.desc", limit: 1 }) : [];
-    $("answer").textContent = answers[0]?.text || "Ответ появится после отправки.";
-    const catches = await select("snitch_catches", { filters: { match_id: match.id, status: "approved" }, order: "approved_at.desc", limit: 1 });
-    if (catches[0]) {
-      const team = teams.find(t => t.id === catches[0].team_id);
-      $("snitch-banner").hidden = false;
-      $("winner").textContent = `Победитель: ${team?.name || "—"}`;
+async function updateScreen() {
+  const res = await apiRequest('get_state');
+  if (!res.success) return;
+
+  const state = res.state;
+  const chat = res.chat;
+
+  // 1. Обновляем счет и шаги
+  const scoreAEl = document.getElementById('score-a');
+  const scoreBEl = document.getElementById('score-b');
+  const stepEl = document.getElementById('current-step');
+  const statusEl = document.getElementById('match-status');
+
+  if (scoreAEl) scoreAEl.textContent = state.team_a_score;
+  if (scoreBEl) scoreBEl.textContent = state.team_b_score;
+  if (stepEl) stepEl.textContent = state.current_step;
+  if (statusEl) {
+    statusEl.textContent = state.status === 'in_progress' ? 'ИДЕТ МАТЧ' : 'ПАУЗА / ОЖИДАНИЕ';
+  }
+
+  // 2. Статус Снитча
+  const snitchBanner = document.getElementById('snitch-banner');
+  if (snitchBanner) {
+    if (state.snitch_status === 'appeared') {
+      snitchBanner.style.display = 'block';
+      snitchBanner.style.background = '#f1c40f';
+      snitchBanner.style.color = '#000';
+      snitchBanner.innerHTML = '⚡ СНИТЧ ПОЯВИЛСЯ НА ПОЛЕ! ⚡';
+    } else if (state.snitch_status === 'caught') {
+      snitchBanner.style.display = 'block';
+      snitchBanner.style.background = '#2ecc71';
+      snitchBanner.style.color = '#fff';
+      snitchBanner.innerHTML = `🏆 СНИТЧ ПОЙМАН! ПОБЕДИТЕЛЬ: ${state.snitch_winner || 'КОМАНДА'}`;
     } else {
-      $("snitch-banner").hidden = true;
+      snitchBanner.style.display = 'none';
     }
-    const chats = await select("chat_messages", { filters: { match_id: match.id }, order: "created_at.desc", limit: 5 });
-    $("events").innerHTML = chats.reverse().map(c => `<div><b>${escapeHtml(c.display_name || c.username)}</b> ${escapeHtml(c.message)}</div>`).join("") || "<div>События появятся здесь.</div>";
-  } catch (e) {
-    $("waiting").textContent = e.message;
+  }
+
+  // 3. Сообщения чата
+  const chatBox = document.getElementById('chat-messages');
+  if (chatBox && chat) {
+    chatBox.innerHTML = '';
+    chat.forEach(msg => {
+      const msgDiv = document.createElement('div');
+      msgDiv.style.marginBottom = '8px';
+      msgDiv.innerHTML = `<span style="color: #f1c40f; font-weight: bold;">[${msg.sender_name}]:</span> ${msg.message}`;
+      chatBox.appendChild(msgDiv);
+    });
+    chatBox.scrollTop = chatBox.scrollHeight;
   }
 }
-
-realtime.subscribe({
-  tables: ["matches","teams","questions","answers","chat_messages","snitch_catches"],
-  callback: () => refresh().catch(console.error)
-});
-refresh();
-
-function statusLabel(s) { return ({waiting:"Ожидание",stage_1:"Этап 1",stage_2:"Этап 2",stage_3:"Этап 3",paused:"Пауза",finished:"Завершён"})[s] || s; }
-function escapeHtml(v) { return String(v ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c])); }
