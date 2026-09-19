@@ -5,31 +5,39 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const username = document.getElementById('username').value.trim();
-    const passcode = document.getElementById('passcode').value.trim();
+    const usernameInput = document.getElementById('username');
+    const passcodeInput = document.getElementById('passcode');
+
+    if (!usernameInput || !passcodeInput) {
+      alert('Ошибка структуры формы: не найдены поля ввода!');
+      return;
+    }
+
+    const username = usernameInput.value.trim();
+    const passcode = passcodeInput.value.trim();
+
+    if (!username || !passcode) {
+      alert('Пожалуйста, заполните логин и пароль.');
+      return;
+    }
 
     try {
-      const { data, error } = await window.supabaseClient.rpc('login_user', {
-        p_username: username,
-        p_passcode: passcode
-      });
+      const res = await apiRequest('login', { username, passcode });
 
-      if (error) {
-        alert('Ошибка авторизации: ' + error.message);
-        return;
+      if (res.success) {
+        if (res.user.role !== 'player') {
+          alert('Этот аккаунт принадлежит судье! Перейдите на страницу входа для судьи.');
+          return;
+        }
+
+        localStorage.setItem('quid_user', JSON.stringify(res.user));
+        window.location.href = 'player.html';
+      } else {
+        alert(res.message || 'Неверный логин или пароль!');
       }
-
-      if (!data || data.length === 0 || data[0].role !== 'player') {
-        alert('Неверный логин или пароль игрока!');
-        return;
-      }
-
-      localStorage.setItem('quid_user', JSON.stringify(data[0]));
-      window.location.href = 'player.html';
-
     } catch (err) {
       console.error(err);
-      alert('Ошибка при подключении к серверу.');
+      alert('Произошла ошибка при попытке входа. Проверьте соединение.');
     }
   });
 });
