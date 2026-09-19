@@ -2,62 +2,58 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Кабинет Игрока — Hogwarts Quidditch</title>
+  <title>Игрок — Hogwarts Quidditch</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <header class="navbar">
-    <div class="logo">✦ Hogwarts Quidditch</div>
-    <div style="display: flex; align-items: center; gap: 15px;">
-      <span id="player-info" style="font-weight: 500;">Загрузка...</span>
+    <div class="logo">✦ Кабинет Игрока</div>
+    <div>
+      <span id="player-info"></span>
       <button class="btn btn-secondary" onclick="logout()">Выйти</button>
     </div>
   </header>
 
-  <main class="container">
-    <!-- Табло матча -->
-    <div class="card">
-      <div style="text-align: center;">
-        <span class="subtitle">MATCH IN PROGRESS</span>
-        <h2 style="margin: 5px 0 20px 0;">Текущий счет</h2>
-      </div>
-
-      <div class="score-board" style="display: flex; justify-content: space-around; align-items: center;">
-        <div style="text-align: center;">
-          <h3>Команда А</h3>
-          <span id="score-a" class="score-display" style="font-size: 3em; font-weight: bold;">0</span>
-        </div>
-
-        <div style="text-align: center;">
-          <div style="font-size: 1.2em;">Шаг: <strong id="current-step">1</strong></div>
-          <div style="margin-top: 5px; color: #888;" id="snitch-status-text">Снитч спрятан</div>
-        </div>
-
-        <div style="text-align: center;">
-          <h3>Команда Б</h3>
-          <span id="score-b" class="score-display" style="font-size: 3em; font-weight: bold;">0</span>
-        </div>
-      </div>
+  <main class="container" style="max-width: 800px; margin: 20px auto;">
+    
+    <!-- Карточка вопроса -->
+    <div class="card" style="background: #222; padding: 20px; border-radius: 8px; text-align: center;">
+      <div style="font-size: 0.9em; color: #888;">ТЕКУЩИЙ ВОПРОС:</div>
+      <h2 id="question-box" style="color: #f1c40f; margin: 15px 0;">Ожидание вопроса...</h2>
+      <div>Таймер: <strong id="timer-box" style="font-size: 1.5em; color: #e74c3c;">0</strong> сек.</div>
+      <div style="margin-top: 10px;">Ход: <span id="turn-box" style="font-weight: bold;">—</span></div>
     </div>
 
-    <!-- Чат игроков -->
+    <!-- Поле ввода ответа -->
     <div class="card" style="margin-top: 20px;">
-      <h3>Игровой Чат</h3>
-      <div id="chat-messages" class="chat-box" style="height: 250px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); padding: 10px; margin-bottom: 10px; border-radius: 6px;">
-        <!-- Сообщения чата -->
+      <h3>Ваш ответ на вопрос</h3>
+      <form id="answer-form" style="display: flex; gap: 10px;">
+        <input type="text" id="answer-input" placeholder="Введите ответ..." style="flex: 1; padding: 10px;">
+        <button type="submit" class="btn btn-primary">Отправить ответ</button>
+      </form>
+    </div>
+
+    <!-- Переключатель чатов: Командный / Общий -->
+    <div class="card" style="margin-top: 20px;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h3>Чат</h3>
+        <div>
+          <button id="btn-team-chat" onclick="setChatMode('team')" style="font-weight: bold;">Командный чат</button>
+          <button id="btn-global-chat" onclick="setChatMode('global')">Общий чат</button>
+        </div>
       </div>
+
+      <div id="chat-messages" style="height: 200px; overflow-y: auto; background: #111; padding: 10px; margin: 10px 0;"></div>
+
       <form id="chat-form" style="display: flex; gap: 10px;">
-        <input type="text" id="chat-input" placeholder="Написать командующим и судье..." style="flex: 1; padding: 8px;">
+        <input type="text" id="chat-input" placeholder="Написать сообщение..." style="flex: 1; padding: 8px;">
         <button type="submit" class="btn btn-primary">Отправить</button>
       </form>
     </div>
   </main>
 
-  <!-- ПРАВИЛЬНЫЙ ПОРЯДОК ПОДКЛЮЧЕНИЯ СКРИПТОВ (без type="module") -->
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
-  <script src="js/chat.js"></script>
   <script src="js/player.js"></script>
 </body>
 </html>
