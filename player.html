@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Игрок — Hogwarts Quidditch</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="index.html">✦ Hogwarts Quidditch</a>
+  <div class="topbar-right"><span id="user-name"></span><button id="logout" class="small-btn ghost">Выйти</button></div>
+</header>
+
+<main class="container">
+  <div id="error" class="error"></div>
+  <section id="empty-state" class="card empty-state">
+    <h2>Матч пока не назначен</h2>
+    <p>Попросите судью добавить вас в матч.</p>
+  </section>
+
+  <div id="app" hidden>
+    <section class="page-heading">
+      <p class="eyebrow">PLAYER DASHBOARD</p>
+      <h1 id="match-title">Матч</h1>
+    </section>
+
+    <section class="score-grid">
+      <article class="card stat"><small>Ваша команда</small><strong id="team-name">—</strong><span id="team-score">0</span></article>
+      <article class="card stat"><small>Позиция</small><strong id="position">—</strong></article>
+      <article class="card stat"><small>Соперник</small><span id="opponent-score">—</span></article>
+      <article class="card stat"><small>Статус</small><strong id="status">—</strong></article>
+    </section>
+
+    <section class="card match-state">
+      <div><span>Этап</span><strong id="stage">—</strong></div>
+      <div><span>Ход</span><strong id="turn">—</strong></div>
+    </section>
+
+    <section id="snitch-panel" class="card snitch-panel" hidden>
+      <p class="eyebrow">SEEKER</p>
+      <h2>Ловец</h2>
+      <p>Загрузите фотографию пойманного снитча. Судья должен подтвердить заявку.</p>
+      <input id="snitch-file" type="file" accept="image/jpeg,image/png,image/webp">
+      <img id="snitch-preview" class="snitch-preview" hidden alt="Предпросмотр снитча">
+      <button id="snitch-submit" class="button gold">Подтвердить поимку</button>
+      <div id="snitch-status" class="muted"></div>
+    </section>
+
+    <div class="two-col">
+      <section class="card">
+        <div class="section-title"><h2>Вопросы</h2><span class="badge">LIVE</span></div>
+        <form id="question-form" class="stack">
+          <textarea id="question-text" maxlength="2000" placeholder="Введите вопрос..." required></textarea>
+          <button class="button" type="submit">Отправить вопрос</button>
+        </form>
+        <div id="question-list" class="list"></div>
+      </section>
+
+      <section class="card">
+        <h2>Ответ</h2>
+        <form id="answer-form" class="stack">
+          <select id="answer-question"></select>
+          <textarea id="answer-text" maxlength="2000" placeholder="Введите ответ..." required></textarea>
+          <button class="button secondary" type="submit">Отправить ответ</button>
+        </form>
+      </section>
+    </div>
+
+    <section class="card">
+      <div class="section-title"><h2>Чат</h2><span class="badge">REALTIME</span></div>
+      <div id="chat" class="chat"></div>
+      <form id="chat-form" class="chat-form">
+        <input id="chat-input" maxlength="2000" placeholder="Сообщение..." required>
+        <button class="button" type="submit">Отправить</button>
+      </form>
+    </section>
+  </div>
+</main>
+<script type="module" src="js/player.js"></script>
+</body>
+</html>

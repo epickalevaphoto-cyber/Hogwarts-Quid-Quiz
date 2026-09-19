@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Hogwarts Quidditch — экран матча</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="screen-page">
+  <main class="screen-shell">
+    <section id="waiting" class="screen-waiting">Ожидание матча…</section>
+    <div id="content" hidden>
+      <header class="screen-header">
+        <p>HOGWARTS QUIDDITCH</p>
+        <h1 id="title">Матч</h1>
+        <div><span id="status">—</span> · <span id="stage">—</span></div>
+      </header>
+      <section id="scores" class="screen-scores"></section>
+      <section class="screen-panel">
+        <span>ТЕКУЩИЙ ВОПРОС</span>
+        <h2 id="question">Вопрос появится здесь.</h2>
+      </section>
+      <section class="screen-panel">
+        <span>ТЕКУЩИЙ ОТВЕТ</span>
+        <h2 id="answer">Ответ появится после отправки.</h2>
+      </section>
+      <section id="snitch-banner" class="snitch-banner" hidden>
+        <strong>СНИТЧ ПОЙМАН!</strong>
+        <span id="winner">Победитель: —</span>
+      </section>
+      <section class="screen-events">
+        <span>ПОСЛЕДНИЕ СОБЫТИЯ</span>
+        <div id="events"></div>
+      </section>
+    </div>
+  </main>
+<script type="module" src="js/screen.js"></script>
+</body>
+</html>
