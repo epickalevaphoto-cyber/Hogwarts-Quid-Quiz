@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Вход для Игроков — Hogwarts Quid Quiz</title>
+  <title>Вход для Игрока — Hogwarts Quidditch</title>
   <link rel="stylesheet" href="css/style.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <div class="container" style="max-width: 400px; margin-top: 50px;">
@@ -16,17 +15,16 @@
           <label for="username">Логин игрока:</label>
           <input type="text" id="username" required autocomplete="username" style="width: 100%; padding: 8px; margin-top: 5px;">
         </div>
-
         <div style="margin-bottom: 20px;">
           <label for="passcode">Пароль:</label>
           <input type="password" id="passcode" required autocomplete="current-password" style="width: 100%; padding: 8px; margin-top: 5px;">
         </div>
-
         <button type="submit" class="btn btn-primary" style="width: 100%;">Войти в игру</button>
       </form>
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
   <script src="js/player-login.js"></script>
 </body>
