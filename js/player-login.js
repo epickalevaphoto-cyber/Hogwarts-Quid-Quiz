@@ -5,8 +5,16 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const username = document.getElementById('username').value.trim();
-    const passcode = document.getElementById('passcode').value.trim();
+    const usernameEl = document.getElementById('username');
+    const passcodeEl = document.getElementById('passcode');
+
+    if (!usernameEl || !passcodeEl) {
+      alert('Ошибка структуры формы: не найдены поля ввода!');
+      return;
+    }
+
+    const username = usernameEl.value.trim();
+    const passcode = passcodeEl.value.trim();
 
     if (!username || !passcode) {
       alert('Заполните логин и пароль!');
@@ -36,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     } catch (err) {
       console.error(err);
-      alert('Произошла непредвиденная ошибка.');
+      alert('Произошла непредвиденная ошибка при входе.');
     }
   });
 });
