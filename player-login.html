@@ -15,17 +15,19 @@
           <label for="username">Логин игрока:</label>
           <input type="text" id="username" required autocomplete="username" style="width: 100%; padding: 8px; margin-top: 5px;">
         </div>
+
         <div style="margin-bottom: 20px;">
           <label for="passcode">Пароль:</label>
           <input type="password" id="passcode" required autocomplete="current-password" style="width: 100%; padding: 8px; margin-top: 5px;">
         </div>
+
         <button type="submit" class="btn btn-primary" style="width: 100%;">Войти в игру</button>
       </form>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase.js"></script>
+  <!-- Подключение API Гугл Таблиц и логики входа -->
+  <script src="js/api.js"></script>
   <script src="js/player-login.js"></script>
 </body>
 </html>
