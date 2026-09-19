@@ -2,64 +2,70 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Панель Судьи — Hogwarts Quidditch</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <header class="navbar">
-    <div class="logo">✦ Панель Судьи</div>
+    <div class="logo">✦ Hogwarts Quidditch — Судья</div>
     <button class="btn btn-secondary" onclick="logout()">Выйти</button>
   </header>
 
-  <main class="container" style="max-width: 900px; margin: 20px auto;">
-    
-    <!-- Счет и ход -->
+  <main class="container" style="max-width: 900px; margin: 30px auto;">
+    <!-- Управление матчем -->
     <div class="card">
-      <h3>Управление Матчем</h3>
-      <div style="display: flex; justify-content: space-around; align-items: center; margin: 20px 0;">
+      <h2>Управление Матчем</h2>
+      <div style="display: flex; justify-content: space-around; align-items: center; margin: 25px 0;">
+        
+        <!-- Команда А -->
         <div style="text-align: center;">
-          <h4>Команда А</h4>
-          <span id="score-a" style="font-size: 3em; font-weight: bold;">0</span>
-          <div>
-            <button onclick="addScore('a', 10)">+10</button>
-            <button onclick="addScore('a', -10)">-10</button>
+          <h3 style="color: #e74c3c;">Команда А (team_1)</h3>
+          <span id="score-a" style="font-size: 4em; font-weight: bold;">0</span>
+          <div style="margin-top: 10px;">
+            <button class="btn btn-small" onclick="addScoreStrict('a', 10)">+10</button>
+            <button class="btn btn-small" onclick="addScoreStrict('a', -10)">-10</button>
           </div>
         </div>
 
-        <div style="text-align: center;">
-          <div>Очередь: <strong id="current-turn-display">Команда 1</strong></div>
-          <button onclick="switchTurn()" style="margin-top: 5px;">Передать ход</button>
-          <div style="margin-top: 15px;">Таймер: <strong id="timer-display">0</strong> сек.</div>
-          <button onclick="startTimer(30)">Запустить 30 сек</button>
-        </div>
+        <!-- Центральный блок управления -->
+        <div style="text-align: center; border-left: 1px solid #333; border-right: 1px solid #333; padding: 0 20px;">
+          <div style="margin-bottom: 10px;">
+            Очередь хода: <br>
+            <strong id="current-turn-display" style="font-size: 1.2em; color: #f1c40f;">—</strong>
+          </div>
+          <button class="btn btn-primary" onclick="passTurn()" style="margin-bottom: 20px;">Передать ход</button>
 
-        <div style="text-align: center;">
-          <h4>Команда Б</h4>
-          <span id="score-b" style="font-size: 3em; font-weight: bold;">0</span>
-          <div>
-            <button onclick="addScore('b', 10)">+10</button>
-            <button onclick="addScore('b', -10)">-10</button>
+          <hr style="border-color: #333; margin: 15px 0;">
+
+          <div>Таймер:</div>
+          <div id="timer-display" style="font-size: 2.5em; font-weight: bold; color: #e74c3c; margin: 5px 0;">00:00</div>
+          <div style="display: flex; gap: 5px; justify-content: center;">
+            <button class="btn btn-small" onclick="startTimerSec(60)">1 мин (Вопрос)</button>
+            <button class="btn btn-small" onclick="startTimerSec(90)">1.5 мин (Ответ)</button>
+            <button class="btn btn-small btn-secondary" onclick="startTimerSec(0)">Сброс</button>
           </div>
         </div>
+
+        <!-- Команда Б -->
+        <div style="text-align: center;">
+          <h3 style="color: #3498db;">Команда Б (team_2)</h3>
+          <span id="score-b" style="font-size: 4em; font-weight: bold;">0</span>
+          <div style="margin-top: 10px;">
+            <button class="btn btn-small" onclick="addScoreStrict('b', 10)">+10</button>
+            <button class="btn btn-small" onclick="addScoreStrict('b', -10)">-10</button>
+          </div>
+        </div>
+
       </div>
     </div>
 
-    <!-- Поле задавания вопросов -->
+    <!-- Чат Судьи -->
     <div class="card" style="margin-top: 20px;">
-      <h3>Задать вопрос игрокам</h3>
-      <div style="display: flex; gap: 10px;">
-        <input type="text" id="question-input" placeholder="Введите вопрос для раунда..." style="flex: 1; padding: 10px;">
-        <button class="btn btn-primary" onclick="sendQuestion()">Задать вопрос</button>
-      </div>
-      <p style="margin-top: 10px; color: #aaa;">Текущий вопрос: <strong id="active-question">—</strong></p>
-    </div>
-
-    <!-- Общий чат для контроля всех ответов -->
-    <div class="card" style="margin-top: 20px;">
-      <h3>Все ответы и Чат</h3>
-      <div id="chat-messages" style="height: 200px; overflow-y: auto; background: #111; padding: 10px; margin-bottom: 10px;"></div>
+      <h3>Все сообщения (Мониторинг всех чатов)</h3>
+      <div id="chat-messages" style="height: 250px; overflow-y: auto; background: #0f111a; padding: 12px; border-radius: 6px; margin-bottom: 10px;"></div>
       <form id="chat-form" style="display: flex; gap: 10px;">
-        <input type="text" id="chat-input" placeholder="Сообщение судьи..." style="flex: 1; padding: 8px;">
+        <input type="text" id="chat-input" placeholder="Сообщение от судьи в общий чат..." style="flex: 1; padding: 10px;">
         <button type="submit" class="btn btn-primary">Отправить</button>
       </form>
     </div>
