@@ -2,51 +2,40 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Игрок — Hogwarts Quidditch</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <header class="navbar">
-    <div class="logo">✦ Кабинет Игрока</div>
+    <div class="logo">✦ Hogwarts Quidditch</div>
     <div>
-      <span id="player-info"></span>
+      <span id="player-info" style="margin-right: 15px; font-weight: bold;"></span>
       <button class="btn btn-secondary" onclick="logout()">Выйти</button>
     </div>
   </header>
 
   <main class="container" style="max-width: 800px; margin: 20px auto;">
-    
-    <!-- Карточка вопроса -->
-    <div class="card" style="background: #222; padding: 20px; border-radius: 8px; text-align: center;">
-      <div style="font-size: 0.9em; color: #888;">ТЕКУЩИЙ ВОПРОС:</div>
-      <h2 id="question-box" style="color: #f1c40f; margin: 15px 0;">Ожидание вопроса...</h2>
-      <div>Таймер: <strong id="timer-box" style="font-size: 1.5em; color: #e74c3c;">0</strong> сек.</div>
-      <div style="margin-top: 10px;">Ход: <span id="turn-box" style="font-weight: bold;">—</span></div>
+    <!-- Статус раунда -->
+    <div class="card" style="text-align: center; padding: 20px;">
+      <div style="font-size: 1.1em; color: #888;">Текущий ход:</div>
+      <h2 id="turn-box" style="margin: 10px 0; font-size: 1.8em;">Загрузка...</h2>
+      
+      <div style="margin-top: 15px;">Осталось времени на ход:</div>
+      <div id="timer-box" style="font-size: 3em; font-weight: bold; color: #e74c3c; margin-top: 5px;">00:00</div>
     </div>
 
-    <!-- Поле ввода ответа -->
+    <!-- Раздельные Чаты -->
     <div class="card" style="margin-top: 20px;">
-      <h3>Ваш ответ на вопрос</h3>
-      <form id="answer-form" style="display: flex; gap: 10px;">
-        <input type="text" id="answer-input" placeholder="Введите ответ..." style="flex: 1; padding: 10px;">
-        <button type="submit" class="btn btn-primary">Отправить ответ</button>
-      </form>
-    </div>
-
-    <!-- Переключатель чатов: Командный / Общий -->
-    <div class="card" style="margin-top: 20px;">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h3>Чат</h3>
-        <div>
-          <button id="btn-team-chat" onclick="setChatMode('team')" style="font-weight: bold;">Командный чат</button>
-          <button id="btn-global-chat" onclick="setChatMode('global')">Общий чат</button>
-        </div>
+      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <button id="tab-team" class="btn btn-primary" onclick="switchTab('team')" style="flex: 1;">🔒 Командный чат</button>
+        <button id="tab-global" class="btn btn-secondary" onclick="switchTab('global')" style="flex: 1; opacity: 0.6;">🌐 Общий чат (Поле)</button>
       </div>
 
-      <div id="chat-messages" style="height: 200px; overflow-y: auto; background: #111; padding: 10px; margin: 10px 0;"></div>
+      <div id="chat-messages" style="height: 280px; overflow-y: auto; background: #0f111a; padding: 12px; border-radius: 6px; margin-bottom: 10px;"></div>
 
       <form id="chat-form" style="display: flex; gap: 10px;">
-        <input type="text" id="chat-input" placeholder="Написать сообщение..." style="flex: 1; padding: 8px;">
+        <input type="text" id="chat-input" placeholder="Введите сообщение..." style="flex: 1; padding: 10px;">
         <button type="submit" class="btn btn-primary">Отправить</button>
       </form>
     </div>
