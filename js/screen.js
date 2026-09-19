@@ -1,59 +1,78 @@
-// js/screen.js
+let isScreenRequesting = false;
+
+const STAGES = [
+  "1. Первые Охотники (Охотники 1)",
+  "2. Вторые Охотники (Охотники 2)",
+  "3. Третьи Охотники (Охотники 3)",
+  "4. Первые Загонщики (Загонщики 1)",
+  "5. Вторые Загонщики (Загонщики 2)",
+  "6. Третьи Загонщики (Загонщики 3)",
+  "7. Первые Ловцы (Ловцы 1)",
+  "8. Вторые Ловцы (Ловцы 2)",
+  "9. Вратари"
+];
 
 document.addEventListener('DOMContentLoaded', () => {
-  updateScreen();
-  // Опрос Google Таблицы каждые 2 секунды для мгновенного обновления табло зрителей
-  setInterval(updateScreen, 2000);
+  syncScreen();
+  setInterval(syncScreen, 1500);
 });
 
-async function updateScreen() {
+async function syncScreen() {
+  if (isScreenRequesting) return;
+  isScreenRequesting = true;
+
   const res = await apiRequest('get_state');
-  if (!res.success) return;
+  isScreenRequesting = false;
+  if (!res || !res.success) return;
 
   const state = res.state;
-  const chat = res.chat;
 
-  // 1. Обновляем счет и шаги
-  const scoreAEl = document.getElementById('score-a');
-  const scoreBEl = document.getElementById('score-b');
-  const stepEl = document.getElementById('current-step');
-  const statusEl = document.getElementById('match-status');
+  // 1. Обновляем счет и этапы
+  const elScoreA = document.getElementById('score-a');
+  if (elScoreA) elScoreA.textContent = state.team_a_score;
 
-  if (scoreAEl) scoreAEl.textContent = state.team_a_score;
-  if (scoreBEl) scoreBEl.textContent = state.team_b_score;
-  if (stepEl) stepEl.textContent = state.current_step;
-  if (statusEl) {
-    statusEl.textContent = state.status === 'in_progress' ? 'ИДЕТ МАТЧ' : 'ПАУЗА / ОЖИДАНИЕ';
-  }
+  const elScoreB = document.getElementById('score-b');
+  if (elScoreB) elScoreB.textContent = state.team_b_score;
 
-  // 2. Статус Снитча
-  const snitchBanner = document.getElementById('snitch-banner');
-  if (snitchBanner) {
-    if (state.snitch_status === 'appeared') {
-      snitchBanner.style.display = 'block';
-      snitchBanner.style.background = '#f1c40f';
-      snitchBanner.style.color = '#000';
-      snitchBanner.innerHTML = '⚡ СНИТЧ ПОЯВИЛСЯ НА ПОЛЕ! ⚡';
-    } else if (state.snitch_status === 'caught') {
-      snitchBanner.style.display = 'block';
-      snitchBanner.style.background = '#2ecc71';
-      snitchBanner.style.color = '#fff';
-      snitchBanner.innerHTML = `🏆 СНИТЧ ПОЙМАН! ПОБЕДИТЕЛЬ: ${state.snitch_winner || 'КОМАНДА'}`;
-    } else {
-      snitchBanner.style.display = 'none';
-    }
-  }
+  const stepIdx = state.current_step || 0;
+  const elStage = document.getElementById('stage-display');
+  if (elStage) elStage.textContent = STAGES[stepIdx] || "Финал";
 
-  // 3. Сообщения чата
+  const elTurn = document.getElementById('turn-display');
+  if (elTurn) elTurn.textContent = state.current_turn === 'team_1' ? 'Команда А' : 'Команда Б';
+
+  // 2. Таймер ММ:СС
+  const now = Date.now();
+  const timerEnd = Number(state.timer_end) || 0;
+  const secondsLeft = Math.max(0, Math.ceil((timerEnd - now) / 1000));
+
+  const mins = String(Math.floor(secondsLeft / 60)).padStart(2, '0');
+  const secs = String(secondsLeft % 60).padStart(2, '0');
+
+  const elTimer = document.getElementById('timer-display');
+  if (elTimer) elTimer.textContent = `${mins}:${secs}`;
+
+  // 3. ЧАТ ГОСТЕЙ: Только сообщения из ОБЩЕГО чата ('global')
   const chatBox = document.getElementById('chat-messages');
-  if (chatBox && chat) {
+  if (chatBox && res.chat) {
     chatBox.innerHTML = '';
-    chat.forEach(msg => {
-      const msgDiv = document.createElement('div');
-      msgDiv.style.marginBottom = '8px';
-      msgDiv.innerHTML = `<span style="color: #f1c40f; font-weight: bold;">[${msg.sender_name}]:</span> ${msg.message}`;
-      chatBox.appendChild(msgDiv);
+    
+    res.chat.forEach(msg => {
+      if (msg.team_code === 'global') {
+        let text = msg.message;
+
+        if (text.startsWith('[IMAGE]')) {
+          const imgData = text.replace('[IMAGE]', '');
+          text = `<br><img src="${imgData}" style="max-width: 100%; max-height: 250px; border-radius: 8px; border: 2px solid #f1c40f; margin-top: 6px;">`;
+        }
+
+        const div = document.createElement('div');
+        div.style.marginBottom = '8px';
+        div.innerHTML = `<strong style="color: #f1c40f;">${msg.sender_name}:</strong> ${text}`;
+        chatBox.appendChild(div);
+      }
     });
+
     chatBox.scrollTop = chatBox.scrollHeight;
   }
 }
